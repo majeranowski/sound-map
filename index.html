@@ -1,470 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Elephant & Castle Sound Map – Demo</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8" />
+<title>Elephant & Castle Sound Map</title>
 
-    body {
-      font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, #0b1224, #050915 45%, #020617 85%);
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    .frame {
-      width: min(92vw, 900px);
-      max-width: 900px;
-      background: linear-gradient(145deg, rgba(30,41,59,0.24), rgba(15,23,42,0.72));
-      border: 1px solid rgba(148,163,184,0.12);
-      border-radius: 24px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.65);
-      padding: 18px;
-      backdrop-filter: blur(10px);
-      max-height: calc(100vh - 32px);
-    }
+body {
+  font-family: "Space Grotesk", sans-serif;
+  background: #e9e3d3;
+  color: #2b2b2b;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
 
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.3rem;
-      letter-spacing: 0.01em;
-    }
+.frame {
+  width: min(92vw, 950px);
+  background: #f6f1e6;
+  border: 2px solid #d6cfc2;
+  border-radius: 18px;
+  padding: 16px;
+}
 
-    .subtitle {
-      font-size: 0.95rem;
-      color: #9ca3af;
-      margin-bottom: 12px;
-      max-width: 880px;
-      line-height: 1.4;
-    }
+h1 {
+  font-size: 1.4rem;
+}
 
-    .map-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1708 / 1329;
-      max-height: 70vh;
-      border-radius: 18px;
-      overflow: hidden;
-      background: #0f172a;
-      border: 1px solid rgba(148,163,184,0.14);
-      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
-    }
+.subtitle {
+  font-size: 0.9rem;
+  color: #6b645c;
+  margin-bottom: 10px;
+}
 
-    .map-wrapper img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1708 / 1329;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #dcd5c6;
+  border: 2px solid #c8c1b2;
+}
 
-    /* PIN STYLE */
+.map-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
-    .pin {
-      position: absolute;
-      width: 26px;
-      height: 26px;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      z-index: 20;
-    }
+/* PIN */
 
-    .pin:hover {
-      z-index: 120;
-    }
+.pin {
+  position: absolute;
+  width: clamp(26px, 8vw, 74px);
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  z-index: 1;
+}
 
-    .pin::after {
-      content: attr(data-label);
-      position: absolute;
-      left: 50%;
-      top: -8px;
-      transform: translate(-50%, -120%);
-      background: rgba(15,23,42,0.92);
-      padding: 6px 10px;
-      border-radius: 10px;
-      color: #e2e8f0;
-      font-size: 11px;
-      border: 1px solid rgba(148,163,184,0.35);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.18s ease, transform 0.18s ease;
-      pointer-events: none;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      z-index: 999;
-    }
+.pin img {
+  width: 100%;
+  transition: transform 0.2s ease;
+}
 
-    .pin-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, #f9fafb, #22c55e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #111827;
-      box-shadow: 0 0 0 0 rgba(34,197,94,0.6);
-      animation: pulse 2.2s infinite;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
+.pin:hover img {
+  transform: scale(1.1);
+}
 
-    .pin-number {
-      font-size: 11px;
-      color: #020617;
-      font-weight: 600;
-      text-shadow: 0 0 3px rgba(255,255,255,0.6);
-    }
+.pin.active img {
+  transform: scale(1.2);
+}
 
-    .pin:hover::after {
-      opacity: 1;
-      transform: translate(-50%, -155%);
-    }
+/* tooltip */
 
-    .pin:hover .pin-inner {
-      transform: scale(1.15);
-      box-shadow: 0 0 0 8px rgba(59,130,246,0.45);
-    }
+.pin::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -8px);
+  background: #fffdf8;
+  border: 1px solid #cfc6b5;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
 
-    .pin.active .pin-inner {
-      background: radial-gradient(circle at 30% 30%, #f9fafb, #38bdf8);
-      box-shadow: 0 0 0 10px rgba(56,189,248,0.5);
-      animation-duration: 1.3s;
-    }
+.pin:hover {
+  z-index: 5000;
+}
 
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
-      }
-      70% {
-        box-shadow: 0 0 0 18px rgba(34,197,94,0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(34,197,94,0);
-      }
-    }
+.pin:hover::after {
+  opacity: 1;
+}
 
-    .player {
-      margin-top: 12px;
-      background: linear-gradient(135deg, rgba(59,130,246,0.18), rgba(15,23,42,0.9));
-      border: 1px solid rgba(56,189,248,0.3);
-      border-radius: 16px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
+/* PLAYER */
 
-    .player-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.player {
+  margin-top: 10px;
+  background: #f1eadf;
+  border: 2px solid #d6cfc2;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .status-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 0 8px rgba(239,68,68,0.16);
-      border: 1px solid rgba(0,0,0,0.4);
-      transition: all 0.18s ease;
-    }
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c0392b;
+  margin-right: 8px;
+}
 
-    .player.playing .status-dot {
-      background: #22c55e;
-      box-shadow: 0 0 0 9px rgba(34,197,94,0.2);
-    }
+.player.playing .status-dot {
+  background: #2e7d32;
+}
 
-    .eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 2px;
-    }
+.track-title {
+  font-size: 0.95rem;
+}
 
-    .track-title {
-      font-size: 1rem;
-      color: #e2e8f0;
-    }
+button {
+  background: none;
+  border: 1px solid #bbb;
+  padding: 6px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+}
 
-    .ghost-btn {
-      background: rgba(255,255,255,0.06);
-      color: #e2e8f0;
-      border: 1px solid rgba(148,163,184,0.35);
-      border-radius: 999px;
-      padding: 8px 14px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.16s ease;
-    }
 
-    .ghost-btn:hover {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(94,234,212,0.45);
-      color: #a5f3fc;
-    }
-
-    .ghost-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .hint {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      color: #7c8699;
-    }
-
-    @media (max-width: 720px) {
-      body {
-        padding: 14px;
-      }
-
-      .player {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .ghost-btn {
-        width: 100%;
-        text-align: center;
-      }
-    }
-
-    @media (min-width: 1100px) {
-      .frame {
-        max-width: 880px;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div class="frame">
-    <h1>Elephant &amp; Castle – Interactive Sound Map</h1>
-    <p class="subtitle">
-      Click a pin to play / stop its sound.
-    </p>
 
-    <div class="map-wrapper">
-      <!-- your static screenshot -->
-      <img src="map.png" alt="Elephant &amp; Castle map">
+<div class="frame">
+<h1>Elephant & Castle – Sound Map</h1>
+<p class="subtitle">Click a location to hear its sound</p>
 
-      <!-- 14 pins: positions are percentages relative to map.png -->
+<div class="map-wrapper">
+<img src="map.png">
 
-      <!-- 1. Traffic Lights -->
-      <div class="pin" data-sound="1" style="left: 74.1%; top: 27.8%;">
-        <div class="pin-inner">
-          <span class="pin-number">1</span>
-        </div>
-      </div>
+<!-- PINS (positioned for YOUR illustration) -->
 
+<div class="pin" data-sound="1" style="left:39%; top:17%;"><img src="pin.png"></div>
+<div class="pin" data-sound="2" style="left:21%; top:83%;"><img src="pin.png"></div>
+<div class="pin" data-sound="3" style="left:64%; top:53%;"><img src="pin.png"></div>
+<div class="pin" data-sound="4" style="left:49%; top:42%;"><img src="pin.png"></div>
+<div class="pin" data-sound="5" style="left:63%; top:76%;"><img src="pin.png"></div>
+<div class="pin" data-sound="6" style="left:28%; top:54%;"><img src="pin.png"></div>
+<div class="pin" data-sound="7" style="left:38%; top:78%;"><img src="pin.png"></div>
+<div class="pin" data-sound="8" style="left:47%; top:55%;"><img src="pin.png"></div>
+<div class="pin" data-sound="9" style="left:44%; top:30%;"><img src="pin.png"></div>
+<div class="pin" data-sound="10" style="left:52%; top:37%;"><img src="pin.png"></div>
+<div class="pin" data-sound="11" style="left:76%; top:52%;"><img src="pin.png"></div>
+<div class="pin" data-sound="12" style="left:61%; top:26%;"><img src="pin.png"></div>
+<div class="pin" data-sound="13" style="left:30%; top:35%;"><img src="pin.png"></div>
+<div class="pin" data-sound="14" style="left:58%; top:82%;"><img src="pin.png"></div>
 
-      <!-- 2. Bus Stop -->
-      <div class="pin" data-sound="2" style="left: 23.0%; top: 78.3%;">
-        <div class="pin-inner">
-          <span class="pin-number">2</span>
-        </div>
-      </div>
+</div>
 
-      <!-- 3. Corner of Elephant Rd and New Kent Rd -->
-      <div class="pin" data-sound="3" style="left: 46.9%; top: 17.9%;">
-        <div class="pin-inner">
-          <span class="pin-number">3</span>
-        </div>
-      </div>
-
-      <!-- 4. Train Station -->
-      <div class="pin" data-sound="4" style="left: 39.6%; top: 47.0%;">
-        <div class="pin-inner">
-          <span class="pin-number">4</span>
-        </div>
-      </div>
-
-      <!-- 5. Construction on New Kent Rd -->
-      <div class="pin" data-sound="5" style="left: 43%; top:7.4%;">
-        <div class="pin-inner">
-          <span class="pin-number">5</span>
-        </div>
-      </div>
-
-      <!-- 6. Ash Avenue -->
-      <div class="pin" data-sound="6" style="left: 73.8%; top: 65.0%;">
-        <div class="pin-inner">
-          <span class="pin-number">6</span>
-        </div>
-      </div>
-
-      <!-- 7. Train Station: Platform 1 -->
-      <div class="pin" data-sound="7" style="left: 38%; top: 43.3%;">
-        <div class="pin-inner">
-          <span class="pin-number">7</span>
-        </div>
-      </div>
-
-      <!-- 8. Community Hub: Building Lift -->
-      <div class="pin" data-sound="8" style="left: 47%; top: 58.4%;">
-        <div class="pin-inner">
-          <span class="pin-number">8</span>
-        </div>
-      </div>
-
-      <!-- 9. Food Market -->
-      <div class="pin" data-sound="9" style="left: 59.4%; top: 25.3%;">
-        <div class="pin-inner">
-          <span class="pin-number">9</span>
-        </div>
-      </div>
-
-      <!-- 10. Construction on New Kent Rd -->
-      <div class="pin" data-sound="10" style="left: 40.7%; top: 11.4%;">
-        <div class="pin-inner">
-          <span class="pin-number">10</span>
-        </div>
-      </div>
-
-      <!-- 11. Elephant Rd near Corsica Studios -->
-      <div class="pin" data-sound="11" style="left: 38.2%; top: 75.0%;">
-        <div class="pin-inner">
-          <span class="pin-number">11</span>
-        </div>
-      </div>
-
-      <!-- 12. Construction on New Kent Rd -->
-      <div class="pin" data-sound="12" style="left: 41%; top: 16.3%;">
-        <div class="pin-inner">
-          <span class="pin-number">12</span>
-        </div>
-      </div>
-
-      <!-- 13. Community Hub -->
-      <div class="pin" data-sound="13" style="left: 47%; top: 64.0%;">
-        <div class="pin-inner">
-          <span class="pin-number">13</span>
-        </div>
-      </div>
-
-      <!-- 14. New Kent Rd: Across Food Market -->
-      <div class="pin" data-sound="14" style="left: 63.0%; top: 17.4%;">
-        <div class="pin-inner">
-          <span class="pin-number">14</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="player" id="playerBar">
-      <div class="player-meta">
-        <span class="status-dot" aria-hidden="true"></span>
-        <div>
-          <p class="eyebrow">Now Playing</p>
-          <p class="track-title" id="nowPlaying">Nothing yet — choose a pin</p>
-        </div>
-      </div>
-      <button class="ghost-btn" id="stopAll" type="button" disabled>Stop</button>
-    </div>
-
-  
+<div class="player" id="playerBar">
+  <div style="display:flex; align-items:center;">
+    <div class="status-dot"></div>
+    <div class="track-title" id="nowPlaying">Nothing playing</div>
   </div>
+  <button id="stopAll">Stop</button>
+</div>
 
-  <script>
-    // Map each pin (1–14) to its audio file in /audio and human-friendly label
-    const locationNames = {
-      1: 'Traffic Lights',
-      2: 'Bus Stop',
-      3: 'Corner of Elephant Rd and New Kent Rd',
-      4: 'Train Station',
-      5: 'Construction on New Kent Rd',
-      6: 'Ash Avenue',
-      7: 'Train Station: Platform 1',
-      8: 'Community Hub: Building Lift',
-      9: 'Food Market',
-      10: 'Construction on New Kent Rd',
-      11: 'Elephant Rd near Corsica Studios',
-      12: 'Construction on New Kent Rd',
-      13: 'Community Hub',
-      14: 'New Kent Rd: Across Food Market'
-    };
+</div>
 
-    const pins = document.querySelectorAll('.pin');
-    const nowPlaying = document.getElementById('nowPlaying');
-    const playerBar = document.getElementById('playerBar');
-    const stopButton = document.getElementById('stopAll');
+<script>
+const names = {
+1:"Borough Rd",
+2:"Cinema Museum",
+3:"Elephant Rd – Castle Square",
+4:"Elephant Square",
+5:"Heygate St",
+6:"Imperial War Museum – Brook Dr",
+7:"Kennington Park Rd",
+8:"London College of Communication",
+9:"London Rd",
+10:"Ministry of Sound",
+11:"New Kent Rd",
+12:"Mercato Metropolitano",
+13:"St George’s Rd",
+14:"Walworth Rd"
+};
 
-    let currentAudio = null;
-    let currentPin = null;
+const files = {
+1:"BOROUGH RD_1.mp3",
+2:"CINEMA MUSEUM_1.mp3",
+3:"ELEPHANT RD - CASTLE SQUARE.mp3",
+4:"ELEPHANT SQUARE_1.mp3",
+5:"HEYGATE ST_1.mp3",
+6:"IMPERIAL WAR MUSEUM - BROOK DR.mp3",
+7:"KENNINGTON PARK RD_1.mp3",
+8:"LONDON COLLEGE OF COMMUNICATION_1.mp3",
+9:"LONDON RD_1.mp3",
+10:"MINISTRY OF SOUND - NEWINGTON CAUSEWAY.mp3",
+11:"NEW KENT RD_1.mp3",
+12:"NEWINGTON CAUSEWAY - MERCATO METROPOLITANO.mp3",
+13:"ST. GEORGE ROAD_1.mp3",
+14:"WALWORTH RD_1.mp3"
+};
 
-    function updateNowPlaying(label) {
-      if (label) {
-        nowPlaying.textContent = label;
-        playerBar.classList.add('playing');
-        stopButton.disabled = false;
-      } else {
-        nowPlaying.textContent = 'Nothing yet — choose a pin';
-        playerBar.classList.remove('playing');
-        stopButton.disabled = true;
-      }
+const pins = document.querySelectorAll('.pin');
+const now = document.getElementById('nowPlaying');
+const bar = document.getElementById('playerBar');
+const stopBtn = document.getElementById('stopAll');
+
+let audio = null;
+let activePin = null;
+
+function stop() {
+  if(audio){
+    audio.pause();
+    audio.currentTime = 0;
+  }
+  if(activePin) activePin.classList.remove('active');
+  audio = null;
+  activePin = null;
+  now.textContent = "Nothing playing";
+  bar.classList.remove('playing');
+}
+
+pins.forEach(pin=>{
+  const id = pin.dataset.sound;
+  pin.setAttribute("data-label", names[id]);
+
+  pin.onclick = ()=>{
+    if(activePin === pin){
+      stop();
+      return;
     }
 
-    function stopCurrent() {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      if (currentPin) {
-        currentPin.classList.remove('active');
-      }
-      currentAudio = null;
-      currentPin = null;
-      updateNowPlaying();
-    }
+    stop();
 
-    pins.forEach(pin => {
-      const soundId = pin.getAttribute('data-sound');
-      const audio = new Audio(`audio/${soundId}.mp3`);
-      const label = locationNames[soundId] || `Track ${soundId}`;
+    audio = new Audio("audio/" + files[id]);
+    activePin = pin;
+    pin.classList.add("active");
 
-      // Store label for hover tooltip
-      pin.setAttribute('data-label', label);
+    now.textContent = names[id];
+    bar.classList.add("playing");
 
-      pin.addEventListener('click', () => {
-        // If this pin is already playing, stop it
-        if (currentPin === pin && currentAudio && !currentAudio.paused) {
-          stopCurrent();
-          return;
-        }
+    audio.play();
+    audio.onended = stop;
+  };
+});
 
-        // Stop whatever is currently playing
-        stopCurrent();
+stopBtn.onclick = stop;
+</script>
 
-        // Play this one
-        currentPin = pin;
-        currentAudio = audio;
-        pin.classList.add('active');
-        updateNowPlaying(label);
-        audio.play().catch(err => {
-          console.error('Audio playback failed:', err);
-        });
-
-        // When the sound ends, reset state
-        audio.onended = () => {
-          if (currentAudio === audio) {
-            stopCurrent();
-          }
-        };
-      });
-    });
-
-    stopButton.addEventListener('click', () => {
-      stopCurrent();
-    });
-  </script>
 </body>
 </html>
