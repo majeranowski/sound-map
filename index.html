@@ -5,6 +5,8 @@
 <title>Elephant & Castle Sound Map</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -12,7 +14,7 @@
 }
 
 body {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Manrope", "Segoe UI", sans-serif;
   background: #e9e3d3;
   color: #2b2b2b;
   display: flex;
@@ -29,16 +31,22 @@ body {
   border: 2px solid #d6cfc2;
   border-radius: 18px;
   padding: 14px;
+  box-shadow: 0 16px 50px rgba(80, 64, 36, 0.12);
 }
 
 h1 {
-  font-size: 1.3rem;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
   line-height: 1.15;
+  letter-spacing: 0.02em;
 }
 
 .subtitle {
-  font-size: 0.86rem;
-  color: #6b645c;
+  font-size: 0.84rem;
+  color: #7d7367;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin: 4px 0 8px;
 }
 
@@ -115,10 +123,29 @@ h1 {
   background: #f1eadf;
   border: 2px solid #d6cfc2;
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 9px 10px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.player-main {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.player-copy {
+  min-width: 0;
+  padding: 1px 0 2px;
+}
+
+.player-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #8a7d6e;
+  margin-bottom: 1px;
 }
 
 .status-dot {
@@ -134,15 +161,55 @@ h1 {
 }
 
 .track-title {
-  font-size: 0.95rem;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.3rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 button {
-  background: none;
+  background: #fbf7ef;
   border: 1px solid #bbb;
   padding: 5px 10px;
   border-radius: 20px;
   cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  color: #5d5448;
+}
+
+body.embed {
+  background: transparent;
+  min-height: auto;
+  padding: 0;
+  display: block;
+}
+
+body.embed .frame {
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+body.embed h1,
+body.embed .subtitle {
+  display: none;
+}
+
+body.embed .map-wrapper {
+  width: 100%;
+  border-radius: 0;
+}
+
+body.embed .player {
+  margin-top: 6px;
 }
 
 @media (max-width: 820px) {
@@ -157,8 +224,16 @@ button {
     padding: 12px;
   }
 
+  h1 {
+    font-size: 1.7rem;
+  }
+
   .pin {
     width: clamp(22px, 8vw, 48px);
+  }
+
+  .track-title {
+    font-size: 1.1rem;
   }
 }
 
@@ -175,7 +250,7 @@ button {
 <div class="map-wrapper">
 <img src="map.png">
 
-<!-- PINS (positioned for YOUR illustration) -->
+<!-- PINS (positioned for illustration) -->
 
 <div class="pin" data-sound="1" style="left:39%; top:17%;"><img src="pin.png"></div>
 <div class="pin" data-sound="2" style="left:21%; top:83%;"><img src="pin.png"></div>
@@ -195,9 +270,12 @@ button {
 </div>
 
 <div class="player" id="playerBar">
-  <div style="display:flex; align-items:center;">
+  <div class="player-main">
     <div class="status-dot"></div>
-    <div class="track-title" id="nowPlaying">Nothing playing</div>
+    <div class="player-copy">
+      <div class="player-label">Now Playing</div>
+      <div class="track-title" id="nowPlaying">Nothing playing</div>
+    </div>
   </div>
   <button id="stopAll">Stop</button>
 </div>
@@ -243,9 +321,14 @@ const pins = document.querySelectorAll('.pin');
 const now = document.getElementById('nowPlaying');
 const bar = document.getElementById('playerBar');
 const stopBtn = document.getElementById('stopAll');
+const isEmbed = new URLSearchParams(window.location.search).get("embed") === "1";
 
 let audio = null;
 let activePin = null;
+
+if (isEmbed) {
+  document.body.classList.add("embed");
+}
 
 function stop() {
   if(audio){
